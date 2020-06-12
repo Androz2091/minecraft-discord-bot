@@ -1,0 +1,10 @@
+{
+
+    "ipAddress": "mc.hypixel.net",
+    "port": "optional - the port of your minecraft server",
+    "playersChannel": "9802980280282",
+    "statusChannel": "3809390383",
+    "updateInterval": "5min",
+
+    "prefix": "!"
+}
