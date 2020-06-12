@@ -1,5 +1,7 @@
 {
 
+    "token": "your discord bot token",
+
     "ipAddress": "mc.hypixel.net",
     "port": "optional - the port of your minecraft server",
     "playersChannel": "9802980280282",
