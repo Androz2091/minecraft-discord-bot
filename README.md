@@ -1,6 +1,6 @@
 # Minecraft Discord Bot
 
-Minecraft Discord Bot is a bot made for Minecraft servers who want to offer a great experience to users on their Discord. Indeed, the users will see if your server is online, how many players are currently connected in voice channels, all of that in real time!
+Minecraft Discord Bot is a bot made for Minecraft servers that want to offer a great experience to users on their Discord. Indeed, users will see if your server is online, how many players are currently connected, all in real time!
 
 ## ✨ Features
 
