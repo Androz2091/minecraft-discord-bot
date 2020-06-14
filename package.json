@@ -1,7 +1,7 @@
 {
   "name": "minecraft-discord-bot",
   "version": "0.1.0",
-  "description": "Minecraft Discord Bot is a bot made for Minecraft servers that want to offer a great experience to users on their Discord.",
+  "description": "View the status and statistics of your MC server directly on Discord!",
   "main": "index.js",
   "directories": {
     "example": "examples"
