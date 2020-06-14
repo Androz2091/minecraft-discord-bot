@@ -21,7 +21,7 @@ const updateChannel = async () => {
     const body = await res.json()
 
     // Get the current player count, or set it to 0
-    const players = (body.players ? body.players.now : 0)
+    const players = body.players.now
 
     // Get the server status
     const status = (body.online ? "Online" : "Offline")
@@ -64,16 +64,20 @@ client.on('message', async (message) => {
         // Parse the mcapi.us response
         const body = await res.json()
 
+        const attachment = new Discord.MessageAttachment(Buffer.from(body.favicon.substr('data:image/png;base64,'.length), 'base64'), "icon.png")
+
         const embed = new Discord.MessageEmbed()
-            .setAuthor("IP address", body.connect)
-            .addField("Version", body.raw.version.name || body.raw.server_engine)
-            .addField("Connected", `${(body.raw.players ? body.raw.players.online : body.players.length)} players`)
-            .addField("Maximum", `${(body.raw.players ? body.raw.players.max : body.maxplayers)} players`)
+            .setAuthor(config.ipAddress)
+            .attachFiles(attachment)
+            .setThumbnail("attachment://icon.png")
+            .addField("Version", body.server.name)
+            .addField("Connected", `${body.players.now} players`)
+            .addField("Maximum", `${body.players.max} players`)
             .addField("Status", (body.online ? "Online" : "Offline"))
             .setColor("#FF0000")
             .setFooter("Open Source Minecraft Discord Bot")
         
-        sentMessage.edit(null, { embed })
+        sentMessage.edit(`:chart_with_upwards_trend: Here are the stats for **${config.ipAddress}**:`, { embed })
     }
 
 })
