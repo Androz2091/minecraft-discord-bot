@@ -17,7 +17,7 @@ Users will see at a glance if your server is online!
 
 #### Stats Command
 
-Users can also request more information using the `stats` command, for example to get the required Miencraft version.
+Users can also request more information using the `stats` command, for example to get the required Minecraft version.
 
 ![stats](./examples/stats-command.png)
 
@@ -34,10 +34,10 @@ Users can also request more information using the `stats` command, for example t
 
 You will have to fill the `config.json` file to make the bot working (rename the `config.sample.json` file to `config.json`). Here are some informations about the config file fields:
 
-* `token` your Discord bot token.
-* `ipAddress`: the IP address of the server you want to track statistics. For example, can be `mc.hypixel.net` for Hypixel.
-* `port`: the port of your minecraft server (optional, you can delete the field).
-* `playersChannel`: the Discord ID of the voice channel that will show the number of players connected to your server.
-* `statusChannel`: the Discord ID of the voice channel that will show the status of your server.
-* `updateInterval`: the interval for the voice channel update. **Due to a recent update of Discord, the interval must be greater than 10 minutes**
+* `token` Your Discord bot token.
+* `ipAddress`: The IP address of the server you want to track statistics. For example, can be `mc.hypixel.net` for Hypixel.
+* `port`: The port of your minecraft server (optional, you can delete the field).
+* `playersChannel`: The Discord ID of the voice channel that will show the number of players connected to your server.
+* `statusChannel`: The Discord ID of the voice channel that will show the status of your server.
+* `updateInterval`: The interval for the voice channel update. **Due to a recent update of Discord, the interval must be greater than 10 minutes**
 * `prefix`: the prefix of the bot for text commands.
