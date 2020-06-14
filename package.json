@@ -1,0 +1,31 @@
+{
+  "name": "minecraft-discord-bot",
+  "version": "0.1.0",
+  "description": "Minecraft Discord Bot is a bot made for Minecraft servers that want to offer a great experience to users on their Discord.",
+  "main": "index.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "node index.js",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Androz2091/minecraft-discord-bot.git"
+  },
+  "keywords": [
+    "Minecraft",
+    "bot"
+  ],
+  "author": "Androz2091",
+  "bugs": {
+    "url": "https://github.com/Androz2091/minecraft-discord-bot/issues"
+  },
+  "homepage": "https://github.com/Androz2091/minecraft-discord-bot#readme",
+  "dependencies": {
+    "discord.js": "^12.2.0",
+    "ms": "^2.1.2",
+    "node-fetch": "^2.6.0"
+  }
+}
