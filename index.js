@@ -52,9 +52,10 @@ const updateChannel = async () => {
 }
 
 client.on('ready', () => {
-    console.log(`Ready. Logged as ${client.user.tag}.`)
+    client.user.setActivity(`the server ${ipAddress}`, { type: 'WATCHING' });
+    console.log(`Ready. Logged as ${client.user.tag}.`);
     setInterval(() => {
-        updateChannel()
+        updateChannel();
     }, ms(updateInterval))
 });
 
