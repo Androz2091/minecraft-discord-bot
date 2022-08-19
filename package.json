@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/Androz2091/minecraft-discord-bot#readme",
   "dependencies": {
-    "discord.js": "^14.0.0",
+    "discord.js": "^12.2.6",
     "ms": "^2.1.2",
     "node-fetch": "^3.2.10"
   },
