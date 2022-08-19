@@ -1,20 +1,34 @@
-const ms = require('ms')
-const fetch = require('node-fetch')
-const Discord = require('discord.js')
-const client = new Discord.Client()
+const fs = require('fs');
+const ms = require('ms');
+const fetch = require('node-fetch');
+const Discord = require('discord.js');
+const client = new Discord.Client();
+client.commands = new Discord.Collection();
 
-const config = require('./config.json')
+const { prefix, token, updateInterval, ipAddress, port, playersChannel, statusChannel } = require('./config.json');
+
+/**
+ * List, collect, and return all commands in the commands folder
+ */
+let commandList = [];
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+for (const file of commandFiles) {
+    const command = require(`./commands/${file}`);
+    // set a new item in the Collection
+    // with the key as the command name and the value as the exported module
+    commandList.push({ 'name': command.name, 'description': command.description, 'usage': command?.usage });
+    client.commands.set(command.name, command);
+}
 
 /**
  * This function is used to update statistics channel
  */
 const updateChannel = async () => {
-
     // Fetch statistics from mcapi.us
-    const res = await fetch(`https://mcapi.us/server/status?ip=${config.ipAddress}${config.port ? `&port=${config.port}` : ''}`)
+    const res = await fetch(`https://mcapi.us/server/status?ip=${ipAddress}${port ? `&port=${port}` : ''}`)
     if (!res) {
         const statusChannelName = `【🛡】Status: Offline`
-        client.channels.cache.get(config.statusChannel).setName(statusChannelName)
+        client.channels.cache.get(statusChannel).setName(statusChannelName)
         return false
     }
     // Parse the mcapi.us response
@@ -31,55 +45,52 @@ const updateChannel = async () => {
     const statusChannelName = `【🛡】Status: ${status}`
 
     // Update channel names
-    client.channels.cache.get(config.playersChannel).setName(playersChannelName)
-    client.channels.cache.get(config.statusChannel).setName(statusChannelName)
+    client.channels.cache.get(playersChannel).setName(playersChannelName)
+    client.channels.cache.get(statusChannel).setName(statusChannelName)
 
     return true
 }
 
 client.on('ready', () => {
-    console.log(`Ready. Logged as ${client.user.tag}.`)
+    client.user.setActivity(`the server ${ipAddress}`, { type: 'WATCHING' });
+    console.log(`Ready. Logged in as ${client.user.tag}.`);
     setInterval(() => {
-        updateChannel()
-    }, ms(config.updateInterval))
-})
+        updateChannel();
+    }, ms(updateInterval))
+});
 
-client.on('message', async (message) => {
+/**
+ * Help command and command handler
+ */
+client.on('message', async message => {
+    if (message.author.bot || message.channel.type === 'dm') return;
 
-    if(message.content === `${config.prefix}force-update`){
-        if (!message.member.hasPermission('MANAGE_MESSAGES')) {
-            return message.channel.send('Only server moderators can run this command!')
-        }
-        const sentMessage = await message.channel.send("Updating the channels, please wait...")
-        await updateChannel()
-        sentMessage.edit("Channels were updated successfully!")
-    }
-
-    if(message.content === `${config.prefix}stats`){
-        const sentMessage = await message.channel.send("Fetching statistics, please wait...")
-
-        // Fetch statistics from mcapi.us
-        const res = await fetch(`https://mcapi.us/server/status?ip=${config.ipAddress}${config.port ? `&port=${config.port}` : ''}`)
-        if (!res) return message.channel.send(`Looks like your server is not reachable... Please verify it's online and it isn't blocking access!`)
-        // Parse the mcapi.us response
-        const body = await res.json()
-
-        const attachment = new Discord.MessageAttachment(Buffer.from(body.favicon.substr('data:image/png;base64,'.length), 'base64'), "icon.png")
-
+    if (message.content == `${prefix}help`) {
         const embed = new Discord.MessageEmbed()
-            .setAuthor(config.ipAddress)
-            .attachFiles(attachment)
-            .setThumbnail("attachment://icon.png")
-            .addField("Version", body.server.name)
-            .addField("Connected", `${body.players.now} players`)
-            .addField("Maximum", `${body.players.max} players`)
-            .addField("Status", (body.online ? "Online" : "Offline"))
-            .setColor("#FF0000")
-            .setFooter("Open Source Minecraft Discord Bot")
-        
-        sentMessage.edit(`:chart_with_upwards_trend: Here are the stats for **${config.ipAddress}**:`, { embed })
+            .setTitle(`${client.user.username} command list`)
+            .setColor('3f04a4')
+            .setThumbnail(client.user.avatarURL())
+            .setDescription(`
+**Server prefix:** \`${prefix}\`\n
+${commandList.map(cmd => `**${cmd.name}**\n${cmd.description}\n\`${prefix}${cmd.usage}\``).join('\n\n')}
+`)
+            .setFooter(`[] is optional, <> is required • command count: ${commandList.length}`);
+        return message.channel.send(embed);
     }
 
-})
+    if (message.author.bot) return;
 
-client.login(config.token)
+    const args = message.content.slice(prefix.length).trim().split(/ +/);
+    const command = args.shift().toLowerCase();
+
+    if (!client.commands.has(command)) return;
+
+    try {
+        client.commands.get(command).execute(client, message, args);
+    } catch (error) {
+        console.error(error);
+        message.reply('There was an error trying to execute that command!');
+    }
+});
+
+client.login(token);
