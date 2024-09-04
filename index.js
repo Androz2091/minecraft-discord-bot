@@ -1,7 +1,13 @@
 const ms = require('ms')
 const fetch = require('node-fetch')
 const Discord = require('discord.js')
-const client = new Discord.Client()
+const client = new Discord.Client({
+    intents: [
+        Discord.IntentsBitField.Flags.Guilds,
+        Discord.IntentsBitField.Flags.GuildMessages,
+        Discord.IntentsBitField.Flags.MessageContent
+    ]
+});
 
 const config = require('./config.json')
 
@@ -44,10 +50,12 @@ client.on('ready', () => {
     }, ms(config.updateInterval))
 })
 
-client.on('message', async (message) => {
+client.on('messageCreate', async (message) => {
+
+    console.log(message.content)
 
     if(message.content === `${config.prefix}force-update`){
-        if (!message.member.hasPermission('MANAGE_MESSAGES')) {
+        if (!message.member.permissions.has(Discord.PermissionsBitField.Flags.ManageMessages)) {
             return message.channel.send('Only server moderators can run this command!')
         }
         const sentMessage = await message.channel.send("Updating the channels, please wait...")
@@ -64,20 +72,32 @@ client.on('message', async (message) => {
         // Parse the mcapi.us response
         const body = await res.json()
 
-        const attachment = new Discord.MessageAttachment(Buffer.from(body.favicon.substr('data:image/png;base64,'.length), 'base64'), "icon.png")
+        const attachment = new Discord.AttachmentBuilder(Buffer.from(body.favicon.substr('data:image/png;base64,'.length), 'base64'), {
+            name: "icon.png",
+            description: "Server Icon"
+        });
 
-        const embed = new Discord.MessageEmbed()
-            .setAuthor(config.ipAddress)
-            .attachFiles(attachment)
+        const embed = new Discord.EmbedBuilder()
+            .setAuthor({
+                name: config.ipAddress
+            })
             .setThumbnail("attachment://icon.png")
-            .addField("Version", body.server.name)
-            .addField("Connected", `${body.players.now} players`)
-            .addField("Maximum", `${body.players.max} players`)
-            .addField("Status", (body.online ? "Online" : "Offline"))
+            .addFields([
+                { name: "Version", value: body.server.name },
+                { name: "Connected", value: `${body.players.now} players` },
+                { name: "Maximum", value: `${body.players.max} players` },
+                { name: "Status", value: (body.online ? "Online" : "Offline") }
+            ])
             .setColor("#FF0000")
-            .setFooter("Open Source Minecraft Discord Bot")
+            .setFooter({
+                text: "Open Source Minecraft Discord Bot"
+            })
         
-        sentMessage.edit(`:chart_with_upwards_trend: Here are the stats for **${config.ipAddress}**:`, { embed })
+        sentMessage.edit({
+            embeds: [embed],
+            content: `:chart_with_upwards_trend: Here are the stats for **${config.ipAddress}**:`,
+            files: [attachment]
+        })
     }
 
 })
