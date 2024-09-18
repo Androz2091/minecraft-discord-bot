@@ -17,7 +17,7 @@ const config = require('./config.json')
 const updateChannel = async () => {
 
     // Fetch statistics from mcapi.us
-    const res = await fetch(`https://mcapi.us/server/status?ip=${config.ipAddress}${config.port ? `&port=${config.port}` : ''}`)
+    const res = await fetch(`https://api.mcsrvstat.us/3/${config.ipAddress}${config.port ? `&port=${config.port}` : ''}`)
     if (!res) {
         const statusChannelName = `【🛡】Status: Offline`
         client.channels.cache.get(config.statusChannel).setName(statusChannelName)
@@ -27,10 +27,10 @@ const updateChannel = async () => {
     const body = await res.json()
 
     // Get the current player count, or set it to 0
-    const players = body.players.now
+    const players = body.players.online
 
     // Get the server status
-    const status = (body.online ? "Online" : "Offline")
+    const status = (body.debug.ping ? "Online" : "Offline")
 
     // Generate channel names
     const playersChannelName = `【👥】Players: ${players}`
@@ -67,12 +67,12 @@ client.on('messageCreate', async (message) => {
         const sentMessage = await message.channel.send("Fetching statistics, please wait...")
 
         // Fetch statistics from mcapi.us
-        const res = await fetch(`https://mcapi.us/server/status?ip=${config.ipAddress}${config.port ? `&port=${config.port}` : ''}`)
+        const res = await fetch(`https://api.mcsrvstat.us/3/${config.ipAddress}${config.port ? `&port=${config.port}` : ''}`)
         if (!res) return message.channel.send(`Looks like your server is not reachable... Please verify it's online and it isn't blocking access!`)
         // Parse the mcapi.us response
         const body = await res.json()
 
-        const attachment = new Discord.AttachmentBuilder(Buffer.from(body.favicon.substr('data:image/png;base64,'.length), 'base64'), {
+        const attachment = new Discord.AttachmentBuilder(Buffer.from(body.icon.substr('data:image/png;base64,'.length), 'base64'), {
             name: "icon.png",
             description: "Server Icon"
         });
@@ -83,10 +83,10 @@ client.on('messageCreate', async (message) => {
             })
             .setThumbnail("attachment://icon.png")
             .addFields([
-                { name: "Version", value: body.server.name },
-                { name: "Connected", value: `${body.players.now} players` },
+                { name: "Version", value: body.version },
+                { name: "Connected", value: `${body.players.online} players` },
                 { name: "Maximum", value: `${body.players.max} players` },
-                { name: "Status", value: (body.online ? "Online" : "Offline") }
+                { name: "Status", value: (body.debug.ping ? "Online" : "Offline") }
             ])
             .setColor("#FF0000")
             .setFooter({
